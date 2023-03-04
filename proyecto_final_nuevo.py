@@ -49,7 +49,7 @@ def traer_datos_entradas():
     print(data)
     var_nombre.set(data[0]), var_apellido.set(data[1]), var_tipo_reserva.set(data[2]) ,var_estado.set(data[3]) ,\
             var_monto.set(data[4]) ,var_fecha.set(data[5]) , var_horario.set(data[6])
-    showinfo("modificar", "ahora puede modificar los campos y precionar el boton modificar")
+    showinfo("Modificar", "Ahora puede modificar los campos y presionar el botón Guardar cambios")
 
 
 
@@ -70,9 +70,9 @@ def nuevo_turno():
         print("datos: ", datos)
         actualizar_treeview()
         limpiar_campos_entradas()
-        showinfo("mensaje", "el turno se ha guardado exitosamente")
+        showinfo("Mensaje", "El turno se ha guardado exitosamente")
     else:
-        showinfo("error", "solo usar letras en los campos")
+        showinfo("Error", "Solo usar letras en los campos")
         print("error")
 
 
@@ -89,17 +89,18 @@ def modificar_turno():
 
     conectar = conexion()
     cursor = conectar.cursor()
-    id_turno = (data_id)
+    id_turno = data_id
     datos=(nombre, apellido, tipo_reserva, estado, monto, fecha, horario, id_turno)
-    sql = "UPDATE turnos SET (nombre, apellido, tipo_reserva, estado, monto, fecha, horario) VALUES (?, ?, ?, ?, ?, ?, ?) WHERE id = ?"
+    sql = "UPDATE turnos SET nombre = ? , apellido = ?, tipo_reserva = ?, estado = ?, monto = ?, fecha = ?, horario = ? WHERE id = ?"
     cursor.execute(sql, datos)
     conectar.commit()
     print("datos: ", datos)
     limpiar_campos_entradas()
+    actualizar_treeview()
 
     
 def eliminar_turnos ():
-    if askyesno("eliminar", "desea eliminar?"):
+    if askyesno("Eliminar", "Desea eliminar?"):
         valor_id = mostrar_turnos.selection()
         item = mostrar_turnos.item(valor_id)
         mi_id = item['text']
@@ -112,7 +113,7 @@ def eliminar_turnos ():
         cursor.execute(sql, data)
         conectar.commit()
         mostrar_turnos.delete(valor_id)
-        showerror('si', "se a eliminado correctamente")
+        showerror('Si', "Se ha eliminado correctamente")
 
     
 
@@ -157,9 +158,15 @@ entry_nombre = Entry(app, textvariable= var_nombre, width=40)
 entry_nombre.grid(row = 1, column = 3)
 entry_apellido = Entry(app, textvariable= var_apellido, width=40)
 entry_apellido.grid(row=1, column = 5)
-entry_reserva = Entry(app, textvariable= var_tipo_reserva)
+entry_reserva = ttk.Combobox(
+    textvariable= var_tipo_reserva,
+    state="readonly",
+    values=["canchita 1", "canchita 2", "canchita 2","canchita 4","canchita 5"])
 entry_reserva.grid(row=2, column=3)
-entry_estado = Entry(app, textvariable = var_estado)
+entry_estado =ttk.Combobox(
+    textvariable= var_estado,
+    state="readonly",
+    values=["impago", "pago parcial", "pago completo"])
 entry_estado.grid(row=2, column=5)
 entry_monto = Entry(app, textvariable= var_monto)
 entry_monto.grid(row=2, column=7)
@@ -216,17 +223,17 @@ def color ():
 menu_bar = Menu(app)
 menu_1 = Menu(menu_bar, tearoff=True)
 menu_1.add_checkbutton(label="Color", command=color)
-menu_1.add_command(label="salir", command= app.quit)
-menu_bar.add_cascade(label="Menu", menu=menu_1)
+menu_1.add_command(label="Salir", command= app.quit)
+menu_bar.add_cascade(label="Menú", menu=menu_1)
 app.config(menu=menu_bar)
 
 # botones
 
-boton_guardar = Button(app, text="Guardar", command= nuevo_turno)
+boton_guardar = Button(app, text="Cargar", command= nuevo_turno)
 boton_guardar.grid(row=3, column = 9)
-boton_Seleccionar = Button(app, text="Seleccion", command= traer_datos_entradas)
+boton_Seleccionar = Button(app, text="Modificar", command= traer_datos_entradas)
 boton_Seleccionar.grid(row=2, column = 9)
-boton_Modificar = Button(app, text="Modificar", command= modificar_turno)
+boton_Modificar = Button(app, text="Guardar cambios", command= modificar_turno)
 boton_Modificar.grid(row=2, column = 10)
 boton_Eliminar = Button(app, text="Eliminar", command= eliminar_turnos)
 boton_Eliminar.grid(row=3, column = 10)
