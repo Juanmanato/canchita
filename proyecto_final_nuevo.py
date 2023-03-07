@@ -21,7 +21,6 @@ def crear_tabla_datos():
                      apellido varchar(64) NOT NULL, \
                      tipo_reserva varchar(64) NOT NULL, \
                      estado varchar(64) NOT NULL, \
-                     monto INT(64) NOT NULL, \
                      fecha varchar(64) NOT NULL, \
                      horario varchar(64) NOT NULL)
                      """
@@ -38,7 +37,7 @@ except:
 
 def limpiar_campos_entradas():
     var_nombre.set(""), var_apellido.set(""), var_tipo_reserva.set("") ,var_estado.set("") ,\
-            var_monto.set("") ,var_fecha.set("") , var_horario.set("")
+            var_fecha.set("") , var_horario.set("")
 
    
 def traer_datos_entradas():
@@ -48,23 +47,23 @@ def traer_datos_entradas():
 
     print(data)
     var_nombre.set(data[0]), var_apellido.set(data[1]), var_tipo_reserva.set(data[2]) ,var_estado.set(data[3]) ,\
-            var_monto.set(data[4]) ,var_fecha.set(data[5]) , var_horario.set(data[6])
+            var_fecha.set(data[4]) , var_horario.set(data[5])
     showinfo("Modificar", "Ahora puede modificar los campos y presionar el botón Guardar cambios")
 
 
 
 def nuevo_turno():
-    nombre, apellido, tipo_reserva, estado, monto, fecha, horario = var_nombre.get(),\
-          var_apellido.get(), var_tipo_reserva.get() ,var_estado.get() ,var_monto.get() ,\
+    nombre, apellido, tipo_reserva, estado, fecha, horario = var_nombre.get(),\
+          var_apellido.get(), var_tipo_reserva.get() ,var_estado.get() ,\
             var_fecha.get() , var_horario.get()
     
-    patron_re="^[A-Za-záéíóú]*$"
-    if re.match( patron_re, nombre) or re.match(patron_re, apellido) or re.match(patron_re, tipo_reserva) or re.match(patron_re, estado):
+    patron_re="^[A-Za-záéíóú]"
+    if (re.match(patron_re, nombre) or re.match(patron_re, apellido)):
         
         conectar = conexion()
         cursor = conectar.cursor()
-        datos=(nombre, apellido, tipo_reserva, estado, monto, fecha, horario)
-        sql = "INSERT INTO turnos(nombre, apellido, tipo_reserva, estado, monto, fecha, horario) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        datos=(nombre, apellido, tipo_reserva, estado, fecha, horario)
+        sql = "INSERT INTO turnos(nombre, apellido, tipo_reserva, estado, fecha, horario) VALUES (?, ?, ?, ?, ?, ?)"
         cursor.execute(sql, datos)
         conectar.commit()
         print("datos: ", datos)
@@ -72,16 +71,16 @@ def nuevo_turno():
         limpiar_campos_entradas()
         showinfo("Mensaje", "El turno se ha guardado exitosamente")
     else:
-        showinfo("Error", "Solo usar letras en los campos")
+        showinfo("Error", "Solo usar letras en los campos de Nombre y Apellido")
         print("error")
 
 
 def modificar_turno():
     
-    nombre, apellido, tipo_reserva, estado, monto, fecha, horario = var_nombre.get(),\
-          var_apellido.get(), var_tipo_reserva.get() ,var_estado.get() ,var_monto.get() ,\
+    nombre, apellido, tipo_reserva, estado, fecha, horario = var_nombre.get(),\
+          var_apellido.get(), var_tipo_reserva.get() ,var_estado.get() ,\
             var_fecha.get() , var_horario.get()
-    print(nombre, apellido, tipo_reserva, estado, monto, fecha, horario)
+    print(nombre, apellido, tipo_reserva, estado, fecha, horario)
     
     valor_id = mostrar_turnos.selection()
     item_id = mostrar_turnos.item(valor_id)
@@ -90,8 +89,8 @@ def modificar_turno():
     conectar = conexion()
     cursor = conectar.cursor()
     id_turno = data_id
-    datos=(nombre, apellido, tipo_reserva, estado, monto, fecha, horario, id_turno)
-    sql = "UPDATE turnos SET nombre = ? , apellido = ?, tipo_reserva = ?, estado = ?, monto = ?, fecha = ?, horario = ? WHERE id = ?"
+    datos=(nombre, apellido, tipo_reserva, estado, fecha, horario, id_turno)
+    sql = "UPDATE turnos SET nombre = ? , apellido = ?, tipo_reserva = ?, estado = ?, fecha = ?, horario = ? WHERE id = ?"
     cursor.execute(sql, datos)
     conectar.commit()
     print("datos: ", datos)
@@ -126,7 +125,7 @@ titulo = Label(app, text="Canchita 5", bg="LightBlue", height=1, width=1)
 titulo.grid(row=0, column=0, columnspan=4, sticky=W+E)
 
 #nombres de entrys
-nombre = Label(app, text="Nombre")
+nombre = Label(app, text="Nombre",)
 nombre.grid(row = 1, column = 2 ,sticky=W)
 apellido = Label(app, text="Apellido")
 apellido.grid(row= 1, column = 4 ,sticky=W)
@@ -134,9 +133,9 @@ tipo_reserva = Label(app, text="Tipo de Reserva")
 tipo_reserva.grid(row = 2, column = 2 ,sticky=W)
 estado = Label(app, text="Estado")
 estado.grid(row=2, column = 4 ,sticky=W)
-monto = Label(app, text="Monto")
-monto.grid(row=2, column = 6 ,sticky=W)
-fecha = Label(app, text="Fecha")
+# monto = Label(app, text="Monto")
+# monto.grid(row=2, column = 6 ,sticky=W)
+fecha = Label(app, text="Día")
 fecha.grid(row=3, column = 2 ,sticky=W)
 horario = Label(app, text= "Horario")
 horario.grid(row=3, column=4 ,sticky=W)
@@ -147,9 +146,9 @@ var_nombre = StringVar()
 var_apellido = StringVar()
 var_tipo_reserva = StringVar()
 var_estado = StringVar()
-var_monto = IntVar()
-var_fecha = IntVar()
-var_horario = IntVar()
+# var_monto = IntVar()
+var_fecha = StringVar()
+var_horario =  StringVar()
 
 
 #entrys entrada de datos
@@ -166,13 +165,17 @@ entry_reserva.grid(row=2, column=3)
 entry_estado =ttk.Combobox(
     textvariable= var_estado,
     state="readonly",
-    values=["impago", "pago parcial", "pago completo"])
+    values=["impago", "señado"])
 entry_estado.grid(row=2, column=5)
-entry_monto = Entry(app, textvariable= var_monto)
-entry_monto.grid(row=2, column=7)
-entry_fecha = Entry(app, textvariable = var_fecha)
+entry_fecha = ttk.Combobox(
+    textvariable = var_fecha,
+    state="readonly",
+    values=["Lunes","Martes", "Miercoles", "Jueves","Viernes","Sabado","domingo"])
 entry_fecha.grid(row=3, column=3)
-entry_horario = Entry(app, textvariable = var_horario)
+entry_horario = ttk.Combobox(
+    textvariable = var_horario,
+    state="readonly",
+    values=[ "10:00 hs", "11:00 hs"])
 entry_horario.grid(row=3, column = 5)
 
 
@@ -180,7 +183,7 @@ entry_horario.grid(row=3, column = 5)
 #tkk tabla de muestra de datos y su funcion
 
 mostrar_turnos = ttk.Treeview(app)
-mostrar_turnos["columns"] = ("c1", "c2", "c3", "c4", "c5","c6", "c7")
+mostrar_turnos["columns"] = ("c1", "c2", "c3", "c4", "c5","c6")
 mostrar_turnos.column("#0", width=50)
 mostrar_turnos.heading("#0",text="")
 mostrar_turnos.column("c1", width=150)
@@ -192,11 +195,9 @@ mostrar_turnos.heading("c3", text="Tipo de Reserva")
 mostrar_turnos.column("c4", width=120)
 mostrar_turnos.heading("c4",text="Estado")
 mostrar_turnos.column("c5", width=120)
-mostrar_turnos.heading("c5", text="Monto")
+mostrar_turnos.heading("c5", text="Fecha")
 mostrar_turnos.column("c6", width=120)
-mostrar_turnos.heading("c6", text="Fecha")
-mostrar_turnos.column("c7", width=120)
-mostrar_turnos.heading("c7", text="horario")
+mostrar_turnos.heading("c6", text="horario")
 mostrar_turnos.grid(row = 5, columnspan= 120)
 
 def actualizar_treeview():
@@ -209,7 +210,7 @@ def actualizar_treeview():
     turnos = cursor.execute(sql)
 
     for row in turnos.fetchall():
-        mostrar_turnos.insert("", "end", text= row[0], values=(row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+        mostrar_turnos.insert("", "end", text= row[0], values=(row[1], row[2], row[3], row[4], row[5],row[6]))
 
 actualizar_treeview()
 
@@ -238,5 +239,6 @@ boton_Modificar.grid(row=2, column = 10)
 boton_Eliminar = Button(app, text="Eliminar", command= eliminar_turnos)
 boton_Eliminar.grid(row=3, column = 10)
 
-
 app.mainloop()
+
+ 
