@@ -120,6 +120,8 @@ def eliminar_turnos ():
 app=Tk()
 app.title("canchita futbol 5")
 app.geometry("1000x500")
+icono = PhotoImage(file="pelota.png")
+app.iconphoto(True, icono)
 
 titulo = Label(app, text="Canchita 5", bg="LightBlue", height=1, width=1)
 titulo.grid(row=0, column=0, columnspan=4, sticky=W+E)
@@ -175,7 +177,8 @@ entry_fecha.grid(row=3, column=3)
 entry_horario = ttk.Combobox(
     textvariable = var_horario,
     state="readonly",
-    values=[ "10:00 hs", "11:00 hs"])
+    values=[ "10:00 hs", "11:00 hs", "12:00 hs", "13:00 hs", "14:00 hs", "15:00 hs", "16:00 hs", "17:00 hs", "18:00 hs",\
+            "19:00 hs", "20:00 hs", "21:00 hs", "22:00 hs",])
 entry_horario.grid(row=3, column = 5)
 
 
