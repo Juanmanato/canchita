@@ -1,11 +1,8 @@
-
-from tkinter import *
+from tkinter import Tk, Label, Entry, Menu, Button, StringVar, Toplevel, PhotoImage, W, E
 from tkinter import ttk
 from tkinter.messagebox import *
-import sqlite3
-import re
-import random
-
+import sqlite3, re
+from tkcalendar import Calendar
 
 # base datos inicio
 
@@ -50,8 +47,6 @@ def traer_datos_entradas():
             var_fecha.set(data[4]) , var_horario.set(data[5])
     showinfo("Modificar", "Ahora puede modificar los campos y presionar el botón Guardar cambios")
 
-
-
 def nuevo_turno():
     nombre, apellido, tipo_reserva, estado, fecha, horario = var_nombre.get(),\
           var_apellido.get(), var_tipo_reserva.get() ,var_estado.get() ,\
@@ -59,17 +54,33 @@ def nuevo_turno():
     
     patron_re="^[A-Za-záéíóú]"
     if (re.match(patron_re, nombre) or re.match(patron_re, apellido)):
-        
         conectar = conexion()
         cursor = conectar.cursor()
         datos=(nombre, apellido, tipo_reserva, estado, fecha, horario)
         sql = "INSERT INTO turnos(nombre, apellido, tipo_reserva, estado, fecha, horario) VALUES (?, ?, ?, ?, ?, ?)"
         cursor.execute(sql, datos)
         conectar.commit()
+        sql = "SELECT * FROM turnos ORDER BY id ASC"
+        conectar = conexion()
+        cursor = conectar.cursor()
+        data = cursor.execute(sql)
+        turno = data.fetchall()
+        verificar_fecha = var_fecha.get()
+        verificar_horario = var_horario.get()
+        bandera = False
+        print( verificar_fecha)
+        for dia, hora in turno:
+            if dia[5] == verificar_fecha and hora[6] == verificar_horario:
+                    showerror(message="Turno no disponible")
+                    bandera = True
+        if(bandera):
+            calendario()
         print("datos: ", datos)
         actualizar_treeview()
         limpiar_campos_entradas()
         showinfo("Mensaje", "El turno se ha guardado exitosamente")
+
+    
     else:
         showinfo("Error", "Solo usar letras en los campos de Nombre y Apellido")
         print("error")
@@ -115,14 +126,44 @@ def eliminar_turnos ():
         showerror('Si', "Se ha eliminado correctamente")
 
     
+def calendario():
+    def print_sel():
+        valor = cal.selection_get()
+        fecha = str(valor)
+        var_fecha.set(fecha)
+        # sql = "SELECT * FROM turnos ORDER BY id ASC"
+        # conectar = conexion()
+        # cursor = conectar.cursor()
+        # data = cursor.execute(sql)
+        # turno = data.fetchall()
+        # verificar_fecha = var_fecha.get()
+        # verificar_horario = var_horario.get()
+        # bandera = False
+        # # print( verificar_fecha)
+        # # for dia, hora in turno:
+        # #     while dia[5] == verificar_fecha and hora[6] == verificar_horario:
+        # #             showerror(message="Turno no disponible")
+        # #             bandera = True
+        # # if(bandera):
+        # #     calendario()
+    top = Toplevel(app)
+    cal = Calendar(top, font="Arial 14", selectmode='day', locale='en_US',
+                   cursor="hand1",day=1, month=3, year=2023 )
+    cal.pack(fill="both", expand=True)
+    Button(top, text="turno", command=print_sel).pack()
+
+ 
 
 #inicio de treeview
 app=Tk()
 app.title("canchita futbol 5")
 app.geometry("1000x500")
-icono = PhotoImage(file="pelota.png")
+icono= PhotoImage(file="./pelota.png")
 app.iconphoto(True, icono)
 
+imagen = PhotoImage(file="./fondo.png")
+fondo = Label(image = imagen )
+fondo.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 titulo = Label(app, text="Canchita 5", bg="LightBlue", height=1, width=1)
 titulo.grid(row=0, column=0, columnspan=4, sticky=W+E)
 
@@ -135,7 +176,7 @@ tipo_reserva = Label(app, text="Tipo de Reserva")
 tipo_reserva.grid(row = 2, column = 2 ,sticky=W)
 estado = Label(app, text="Estado")
 estado.grid(row=2, column = 4 ,sticky=W)
-fecha = Label(app, text="Día")
+fecha = Button(app, text="Fecha", command = calendario)
 fecha.grid(row=3, column = 2 ,sticky=W)
 horario = Label(app, text= "Horario")
 horario.grid(row=3, column=4 ,sticky=W)
@@ -166,10 +207,7 @@ entry_estado =ttk.Combobox(
     state="readonly",
     values=["impago", "señado"])
 entry_estado.grid(row=2, column=5)
-entry_fecha = ttk.Combobox(
-    textvariable = var_fecha,
-    state="readonly",
-    values=["Lunes","Martes", "Miercoles", "Jueves","Viernes","Sabado","domingo"])
+entry_fecha = Entry(app, textvariable= var_fecha, width=20)
 entry_fecha.grid(row=3, column=3)
 entry_horario = ttk.Combobox(
     textvariable = var_horario,
@@ -215,15 +253,9 @@ def actualizar_treeview():
 actualizar_treeview()
 
 #menu y funcion de menu
-
-def color ():
-   colores = ["snow", "cadet blue", "misty rose", "dark slate blue", "deep sky blue", "salmon3","DarkOrange1"]
-   color = random.choice(colores)
-   app.config(bg=color)
     
 menu_bar = Menu(app)
 menu_1 = Menu(menu_bar, tearoff=True)
-menu_1.add_checkbutton(label="Color", command=color)
 menu_1.add_command(label="Salir", command= app.quit)
 menu_bar.add_cascade(label="Menú", menu=menu_1)
 app.config(menu=menu_bar)
@@ -240,5 +272,3 @@ boton_Eliminar = Button(app, text="Eliminar", command= eliminar_turnos)
 boton_Eliminar.grid(row=3, column = 10)
 
 app.mainloop()
-
- 
