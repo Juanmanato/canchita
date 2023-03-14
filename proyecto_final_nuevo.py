@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter.messagebox import *
 import sqlite3, re
 from tkcalendar import Calendar
-
+#import Calendar
 # base datos inicio
 
 def conexion():
@@ -236,7 +236,7 @@ mostrar_turnos.column("c5", width=120)
 mostrar_turnos.heading("c5", text="Fecha")
 mostrar_turnos.column("c6", width=120)
 mostrar_turnos.heading("c6", text="horario")
-mostrar_turnos.grid(row = 5, columnspan= 120)
+mostrar_turnos.grid(row = 5, columnspan= 12,padx=80, pady=30)
 
 def actualizar_treeview():
     for dato in mostrar_turnos.get_children():
